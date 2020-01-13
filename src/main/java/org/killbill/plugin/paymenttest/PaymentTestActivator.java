@@ -5,8 +5,8 @@ import org.killbill.billing.osgi.libs.killbill.KillbillActivatorBase;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
 import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
 import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
+import org.killbill.plugin.paymenttest.core.OldTestPaymentPluginAPI;
 import org.killbill.plugin.paymenttest.core.State;
-import org.killbill.plugin.paymenttest.core.TestPaymentPluginAPI;
 import org.killbill.plugin.paymenttest.resources.PaymentTestResource;
 import org.osgi.framework.BundleContext;
 
@@ -30,7 +30,7 @@ public class PaymentTestActivator extends KillbillActivatorBase {
         super.start(context);
 
         final State state = new State();
-        final TestPaymentPluginAPI testPlugin = new TestPaymentPluginAPI(state);
+        final OldTestPaymentPluginAPI testPlugin = new OldTestPaymentPluginAPI(state);
 
         registerPaymentPluginApi(context, testPlugin);
 

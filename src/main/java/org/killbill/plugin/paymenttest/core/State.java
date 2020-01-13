@@ -28,7 +28,7 @@ public class State {
     public void add(final Actions action, @Nullable final String forMethod) {
 
         if (forMethod == null) {
-            this.states.put(action, TestPaymentPluginAPI.getAuthorizedMethods());
+            this.states.put(action, OldTestPaymentPluginAPI.getAuthorizedMethods());
         }
         else {
             Set<String> methods = this.states.get(action);

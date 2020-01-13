@@ -21,12 +21,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class TestPaymentPluginAPI implements PaymentPluginApi {
+public class OldTestPaymentPluginAPI implements PaymentPluginApi {
 
 
     private final State state;
 
-    public TestPaymentPluginAPI(final State state) {
+    public OldTestPaymentPluginAPI(final State state) {
         this.state = state;
     }
 

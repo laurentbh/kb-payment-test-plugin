@@ -5,11 +5,11 @@ import org.testng.annotations.Test;
 
 import java.util.Set;
 
-public class TestPaymentPluginAPITest {
+public class TestPaymentPluginAPIOldTest {
 
     @Test
     public void testGetAuthorizedMethods() {
-        final Set<String> set = TestPaymentPluginAPI.getAuthorizedMethods();
+        final Set<String> set = OldTestPaymentPluginAPI.getAuthorizedMethods();
 
         Assert.assertEquals(true, true);
     }
