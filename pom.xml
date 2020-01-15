@@ -102,11 +102,11 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.killbill.plugin.paymenttest.PaymentTestActivator</Bundle-Activator>
+                        <Bundle-Activator>org.killbill.billing.plugin.paymenttest.PaymentTestActivator</Bundle-Activator>
                         <Export-Package>
                             org.killbill.billing.plugin.service
                         </Export-Package>
-                        <Private-Package>org.killbill.plugin.paymenttest.*</Private-Package>
+                        <Private-Package>org.killbill.billing.plugin.paymenttest.*</Private-Package>
                         <!-- Optional resolution because exported by the Felix system bundle -->
                         <Import-Package>
                             org.killbill.billing.account.api;
@@ -271,7 +271,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>assemble-killbill-osgi-bundles-sp-java-plugin</id>
+                        <id>assemble-killbill-osgi-bundles-paymenttest-java-plugin</id>
                         <goals>
                             <goal>shade</goal>
                         </goals>

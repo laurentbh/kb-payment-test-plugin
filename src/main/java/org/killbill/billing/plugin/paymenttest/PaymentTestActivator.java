@@ -1,12 +1,12 @@
-package org.killbill.plugin.paymenttest;
+package org.killbill.billing.plugin.paymenttest;
 
 import org.killbill.billing.osgi.api.OSGIPluginProperties;
 import org.killbill.billing.osgi.libs.killbill.KillbillActivatorBase;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
 import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
 import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
-import org.killbill.plugin.paymenttest.dao.PaymentTestDao;
-import org.killbill.plugin.paymenttest.resources.PaymentTestResource;
+import org.killbill.billing.plugin.paymenttest.dao.PaymentTestDao;
+import org.killbill.billing.plugin.paymenttest.resources.PaymentTestResource;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

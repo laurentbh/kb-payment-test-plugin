@@ -1,4 +1,4 @@
-package org.killbill.plugin.paymenttest.model;
+package org.killbill.billing.plugin.paymenttest.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

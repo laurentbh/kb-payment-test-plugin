@@ -31,7 +31,7 @@
         </database>
 
         <target>
-            <packageName>org.killbill.plugin.paymenttest.dao.gen</packageName>
+            <packageName>org.killbill.billing.plugin.paymenttest.dao.gen</packageName>
             <directory>src/main/java/</directory>
         </target>
     </generator>

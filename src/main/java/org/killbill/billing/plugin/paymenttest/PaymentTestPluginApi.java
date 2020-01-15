@@ -1,4 +1,4 @@
-package org.killbill.plugin.paymenttest;
+package org.killbill.billing.plugin.paymenttest;
 
 import org.killbill.billing.catalog.api.Currency;
 import org.killbill.billing.osgi.libs.killbill.OSGIConfigPropertiesService;
@@ -14,11 +14,11 @@ import org.killbill.billing.payment.plugin.api.PaymentTransactionInfoPlugin;
 import org.killbill.billing.plugin.api.payment.PluginPaymentPluginApi;
 import org.killbill.billing.util.callcontext.CallContext;
 import org.killbill.clock.Clock;
-import org.killbill.plugin.paymenttest.dao.PaymentTestDao;
-import org.killbill.plugin.paymenttest.dao.gen.tables.TestpaymentPaymentMethods;
-import org.killbill.plugin.paymenttest.dao.gen.tables.TestpaymentResponses;
-import org.killbill.plugin.paymenttest.dao.gen.tables.records.TestpaymentPaymentMethodsRecord;
-import org.killbill.plugin.paymenttest.dao.gen.tables.records.TestpaymentResponsesRecord;
+import org.killbill.billing.plugin.paymenttest.dao.PaymentTestDao;
+import org.killbill.billing.plugin.paymenttest.dao.gen.tables.TestpaymentPaymentMethods;
+import org.killbill.billing.plugin.paymenttest.dao.gen.tables.TestpaymentResponses;
+import org.killbill.billing.plugin.paymenttest.dao.gen.tables.records.TestpaymentPaymentMethodsRecord;
+import org.killbill.billing.plugin.paymenttest.dao.gen.tables.records.TestpaymentResponsesRecord;
 
 import java.math.BigDecimal;
 import java.util.UUID;
