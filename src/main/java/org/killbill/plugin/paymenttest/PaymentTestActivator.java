@@ -5,8 +5,7 @@ import org.killbill.billing.osgi.libs.killbill.KillbillActivatorBase;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
 import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
 import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
-import org.killbill.plugin.paymenttest.core.OldTestPaymentPluginAPI;
-import org.killbill.plugin.paymenttest.core.State;
+import org.killbill.plugin.paymenttest.dao.PaymentTestDao;
 import org.killbill.plugin.paymenttest.resources.PaymentTestResource;
 import org.osgi.framework.BundleContext;
 
@@ -16,33 +15,34 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
 public class PaymentTestActivator extends KillbillActivatorBase {
-    public static final String PLUGIN_NAME = "killbill-payment-test";
+    public static final String PLUGIN_NAME = "payment-test-plugin";
 
-
-    public PaymentTestActivator() {
-
-
-    }
 
     @Override
     public void start(final BundleContext context) throws Exception {
 
         super.start(context);
 
-        final State state = new State();
-        final OldTestPaymentPluginAPI testPlugin = new OldTestPaymentPluginAPI(state);
+        final PaymentTestDao paymentTestDao = new PaymentTestDao(this.dataSource.getDataSource());
+        final TestingStates testingStates = new TestingStates();
 
-        registerPaymentPluginApi(context, testPlugin);
+
+        final PaymentTestPluginApi pluginApi = new PaymentTestPluginApi(this.killbillAPI,
+                                                                        this.configProperties,
+                                                                        this.logService,
+                                                                        this.clock.getClock(),
+                                                                        paymentTestDao);
+        registerPaymentPluginApi(context, pluginApi);
 
         final PluginApp pluginApp = new PluginAppBuilder(PLUGIN_NAME,
                                                          this.killbillAPI,
                                                          this.logService,
                                                          this.dataSource,
-                                                         super.clock,
+                                                         this.clock,
                                                          this.configProperties).withRouteClass(PaymentTestResource.class)
                                                                                .withService(this.killbillAPI)
                                                                                .withService(this.roOSGIkillbillAPI)
-                                                                               .withService(super.clock)
+                                                                               .withService(this.clock)
                                                                                .build();
 
         final HttpServlet httpServlet = PluginApp.createServlet(pluginApp);

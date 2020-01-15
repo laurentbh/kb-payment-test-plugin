@@ -12,9 +12,9 @@ import org.killbill.billing.payment.plugin.api.PaymentMethodInfoPlugin;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApiException;
 import org.killbill.billing.payment.plugin.api.PaymentTransactionInfoPlugin;
 import org.killbill.billing.plugin.api.payment.PluginPaymentPluginApi;
-import org.killbill.billing.plugin.dao.payment.PluginPaymentDao;
 import org.killbill.billing.util.callcontext.CallContext;
 import org.killbill.clock.Clock;
+import org.killbill.plugin.paymenttest.dao.PaymentTestDao;
 import org.killbill.plugin.paymenttest.dao.gen.tables.TestpaymentPaymentMethods;
 import org.killbill.plugin.paymenttest.dao.gen.tables.TestpaymentResponses;
 import org.killbill.plugin.paymenttest.dao.gen.tables.records.TestpaymentPaymentMethodsRecord;
@@ -29,7 +29,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                 final OSGIConfigPropertiesService configProperties,
                                 final OSGIKillbillLogService logService,
                                 final Clock clock,
-                                final PluginPaymentDao<TestpaymentResponsesRecord, TestpaymentResponses, TestpaymentPaymentMethodsRecord, TestpaymentPaymentMethods> dao) {
+                                final PaymentTestDao dao) {
         super(killbillAPI, configProperties, logService, clock, dao);
     }
 
