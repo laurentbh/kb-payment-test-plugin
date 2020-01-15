@@ -8,6 +8,8 @@ import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
 import org.killbill.plugin.paymenttest.dao.PaymentTestDao;
 import org.killbill.plugin.paymenttest.resources.PaymentTestResource;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Hashtable;
 
@@ -17,12 +19,20 @@ import javax.servlet.http.HttpServlet;
 public class PaymentTestActivator extends KillbillActivatorBase {
     public static final String PLUGIN_NAME = "payment-test-plugin";
 
+    private static final Logger logger = LoggerFactory.getLogger(PaymentTestActivator.class);
+
+    public PaymentTestActivator() {
+        System.out.println(">>>> PaymentTestActivator");
+        logger.warn(">>>> PaymentTestActivator");
+    }
 
     @Override
     public void start(final BundleContext context) throws Exception {
 
         super.start(context);
 
+        System.out.println(">>>> start");
+        logger.warn(">>>> start");
         final PaymentTestDao paymentTestDao = new PaymentTestDao(this.dataSource.getDataSource());
         final TestingStates testingStates = new TestingStates();
 
