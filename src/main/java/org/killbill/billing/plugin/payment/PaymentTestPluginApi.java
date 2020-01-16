@@ -28,14 +28,17 @@ import java.util.UUID;
 public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResponsesRecord, TestpaymentResponses, TestpaymentPaymentMethodsRecord, TestpaymentPaymentMethods> {
 
     private final PaymentTestDao dao;
+    private final TestingStates  testingStates;
 
     public PaymentTestPluginApi(final OSGIKillbillAPI killbillAPI,
                                 final OSGIConfigPropertiesService configProperties,
                                 final OSGIKillbillLogService logService,
                                 final Clock clock,
-                                final PaymentTestDao dao) {
+                                final PaymentTestDao dao,
+                                final TestingStates testingStates) {
         super(killbillAPI, configProperties, logService, clock, dao);
         this.dao = dao;
+        this.testingStates = testingStates;
     }
 
     @Override

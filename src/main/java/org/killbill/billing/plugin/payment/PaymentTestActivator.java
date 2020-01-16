@@ -37,7 +37,8 @@ public class PaymentTestActivator extends KillbillActivatorBase {
                                                                         this.configProperties,
                                                                         this.logService,
                                                                         this.clock.getClock(),
-                                                                        paymentTestDao);
+                                                                        paymentTestDao,
+                                                                        testingStates);
         registerPaymentPluginApi(context, pluginApi);
 
         final PluginApp pluginApp = new PluginAppBuilder(PLUGIN_NAME,
