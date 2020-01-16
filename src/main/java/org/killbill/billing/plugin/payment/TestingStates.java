@@ -1,7 +1,5 @@
 package org.killbill.billing.plugin.payment;
 
-import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,29 +21,27 @@ public class TestingStates {
         RETURN_NIL
     }
 
-    private final Map<Actions, Set<String>> states;
+    // key is method, "*" is for any method
+    private final Map<String, Actions> states;
 
     public TestingStates() {
         this.states = new HashMap<>();
 
-        final Class cls = PaymentPluginApi.class;
+        final Class cls = PaymentTestPluginApi.class;
         final Method[] methods = cls.getMethods();
+        // TODO: remove method like hashCode, notify, toString ...
         this.allowedMethods = Arrays.stream(methods).map(Method::getName).collect(Collectors.toSet());
     }
 
-    //    public Actions getAction
+    public boolean add(final Actions action, @Nullable final String forMethod) {
 
-    public void add(final Actions action, @Nullable final String forMethod) {
-
-        //        if (forMethod == null) {
-        //            this.states.put(action, OldTestPaymentPluginAPI.getAuthorizedMethods());
-        //        }
-        //        else {
-        //            Set<String> methods = this.states.get(action);
-        //            if (methods == null) {
-        //                methods = new HashSet<>();
-        //            }
-        //            methods.add(forMethod);
-        //        }
+        if (forMethod != null) {
+            if (this.allowedMethods.contains(forMethod) == false) {
+                return false;
+            }
+        }
+        final String method = (forMethod != null) ? forMethod : "*";
+        this.states.put(method, action);
+        return true;
     }
 }

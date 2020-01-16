@@ -1,5 +1,8 @@
 package org.killbill.billing.plugin.payment.resources;
 
+import org.jooby.Result;
+import org.jooby.Results;
+import org.jooby.Status;
 import org.jooby.mvc.Body;
 import org.jooby.mvc.GET;
 import org.jooby.mvc.POST;
@@ -29,6 +32,15 @@ public class PaymentTestResource {
 
     @Path("configure")
     @POST
-    public void configure(@Body final Payload payload) {
+    public Result configure(@Body final Payload payload) {
+
+        final boolean added = this.testingStates.add(TestingStates.Actions.valueOf(payload.getAction()),
+                                                     payload.getMethods());
+
+        if (!added) {
+            // TODO: add reason in error body
+            return Results.with("Error adding").status(Status.BAD_REQUEST);
+        }
+        return Results.with(Status.OK);
     }
 }
