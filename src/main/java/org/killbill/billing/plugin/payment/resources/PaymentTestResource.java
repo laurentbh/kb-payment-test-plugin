@@ -1,11 +1,11 @@
-package org.killbill.billing.plugin.paymenttest.resources;
+package org.killbill.billing.plugin.payment.resources;
 
 import org.jooby.mvc.Body;
 import org.jooby.mvc.GET;
 import org.jooby.mvc.POST;
 import org.jooby.mvc.Path;
-import org.killbill.billing.plugin.paymenttest.TestingStates;
-import org.killbill.billing.plugin.paymenttest.model.Payload;
+import org.killbill.billing.plugin.payment.TestingStates;
+import org.killbill.billing.plugin.payment.model.Payload;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

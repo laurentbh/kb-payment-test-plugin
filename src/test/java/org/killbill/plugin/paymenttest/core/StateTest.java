@@ -1,6 +1,6 @@
 package org.killbill.plugin.paymenttest.core;
 
-import org.killbill.billing.plugin.paymenttest.TestingStates;
+import org.killbill.billing.plugin.payment.TestingStates;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

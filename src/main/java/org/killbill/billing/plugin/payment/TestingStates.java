@@ -1,4 +1,4 @@
-package org.killbill.billing.plugin.paymenttest;
+package org.killbill.billing.plugin.payment;
 
 import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
 
