@@ -1,5 +1,6 @@
 package org.killbill.billing.plugin.payment;
 
+import org.joda.time.DateTime;
 import org.killbill.billing.catalog.api.Currency;
 import org.killbill.billing.osgi.libs.killbill.OSGIConfigPropertiesService;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillAPI;
@@ -12,18 +13,21 @@ import org.killbill.billing.payment.plugin.api.PaymentMethodInfoPlugin;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApiException;
 import org.killbill.billing.payment.plugin.api.PaymentTransactionInfoPlugin;
 import org.killbill.billing.plugin.api.payment.PluginPaymentPluginApi;
-import org.killbill.billing.util.callcontext.CallContext;
-import org.killbill.clock.Clock;
 import org.killbill.billing.plugin.payment.dao.PaymentTestDao;
 import org.killbill.billing.plugin.payment.dao.gen.tables.TestpaymentPaymentMethods;
 import org.killbill.billing.plugin.payment.dao.gen.tables.TestpaymentResponses;
 import org.killbill.billing.plugin.payment.dao.gen.tables.records.TestpaymentPaymentMethodsRecord;
 import org.killbill.billing.plugin.payment.dao.gen.tables.records.TestpaymentResponsesRecord;
+import org.killbill.billing.util.callcontext.CallContext;
+import org.killbill.clock.Clock;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResponsesRecord, TestpaymentResponses, TestpaymentPaymentMethodsRecord, TestpaymentPaymentMethods> {
+
+    private final PaymentTestDao dao;
 
     public PaymentTestPluginApi(final OSGIKillbillAPI killbillAPI,
                                 final OSGIConfigPropertiesService configProperties,
@@ -31,6 +35,41 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                 final Clock clock,
                                 final PaymentTestDao dao) {
         super(killbillAPI, configProperties, logService, clock, dao);
+        this.dao = dao;
+    }
+
+    @Override
+    public void addPaymentMethod(final UUID kbAccountId,
+                                 final UUID kbPaymentMethodId,
+                                 final PaymentMethodPlugin paymentMethodProps,
+                                 final boolean setDefault,
+                                 final Iterable<PluginProperty> properties,
+                                 final CallContext context) throws PaymentPluginApiException {
+        try {
+            this.dao.addPaymentMethod(kbAccountId,
+                                      kbPaymentMethodId,
+                                      null,
+                                      this.clock.getUTCNow(),
+                                      context.getTenantId());
+        }
+        catch (final SQLException e) {
+            throw new PaymentPluginApiException("Unable to add payment method", e);
+        }
+    }
+
+    @Override
+    public void deletePaymentMethod(final UUID kbAccountId,
+                                    final UUID kbPaymentMethodId,
+                                    final Iterable<PluginProperty> properties,
+                                    final CallContext context) throws PaymentPluginApiException {
+        final DateTime utcNow = this.clock.getUTCNow();
+        try {
+            this.dao.deletePaymentMethod(kbPaymentMethodId, utcNow, context.getTenantId());
+        }
+        catch (final SQLException e) {
+            throw new PaymentPluginApiException("Unable to delete payment method for kbPaymentMethodId " + kbPaymentMethodId,
+                                                e);
+        }
     }
 
     @Override
