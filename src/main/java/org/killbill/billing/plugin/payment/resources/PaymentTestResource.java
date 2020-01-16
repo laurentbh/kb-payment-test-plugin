@@ -24,7 +24,6 @@ public class PaymentTestResource {
     @Path("status")
     @GET
     public void status() {
-        System.out.println(">?>>>>");
 
     }
 
