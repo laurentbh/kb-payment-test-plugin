@@ -1,4 +1,4 @@
-package org.killbill.billing.plugin.paymenttest.model;
+package org.killbill.billing.plugin.payment.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;

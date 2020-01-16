@@ -1,12 +1,12 @@
-package org.killbill.billing.plugin.paymenttest;
+package org.killbill.billing.plugin.payment;
 
 import org.killbill.billing.osgi.api.OSGIPluginProperties;
 import org.killbill.billing.osgi.libs.killbill.KillbillActivatorBase;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
 import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
 import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
-import org.killbill.billing.plugin.paymenttest.dao.PaymentTestDao;
-import org.killbill.billing.plugin.paymenttest.resources.PaymentTestResource;
+import org.killbill.billing.plugin.payment.dao.PaymentTestDao;
+import org.killbill.billing.plugin.payment.resources.PaymentTestResource;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,22 +17,18 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
 public class PaymentTestActivator extends KillbillActivatorBase {
-    public static final String PLUGIN_NAME = "payment-test-plugin";
+    public static final String PLUGIN_NAME = "killbill-payment-test";
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentTestActivator.class);
 
-    public PaymentTestActivator() {
-        System.out.println(">>>> PaymentTestActivator");
-        logger.warn(">>>> PaymentTestActivator");
-    }
 
     @Override
     public void start(final BundleContext context) throws Exception {
 
         super.start(context);
 
-        System.out.println(">>>> start");
-        logger.warn(">>>> start");
+        logger.warn(">>>> PaymentTestActivator::starting !!!!!!!");
+
         final PaymentTestDao paymentTestDao = new PaymentTestDao(this.dataSource.getDataSource());
         final TestingStates testingStates = new TestingStates();
 

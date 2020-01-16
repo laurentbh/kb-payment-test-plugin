@@ -10,7 +10,8 @@
         <version>0.143.41</version>
     </parent>
 
-    <groupId>lbuhler</groupId>
+    <packaging>bundle</packaging>
+    <groupId>org.killbill.billing.plugin.payment</groupId>
     <artifactId>payment-test-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -28,20 +29,103 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.kill-bill.billing</groupId>
-            <artifactId>killbill-platform-osgi-api</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.kill-bill.billing.plugin.java</groupId>
-            <artifactId>killbill-base-plugin</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.kill-bill.billing.plugin</groupId>
             <artifactId>killbill-plugin-api-payment</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.kill-bill.billing</groupId>
+            <artifactId>killbill-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kill-bill.billing</groupId>
+            <artifactId>killbill-platform-osgi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kill-bill.billing</groupId>
+            <artifactId>killbill-platform-osgi-bundles-lib-killbill</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kill-bill.billing</groupId>
+            <artifactId>killbill-platform-osgi-bundles-lib-slf4j-osgi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kill-bill.billing.plugin.java</groupId>
+            <artifactId>killbill-base-plugin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kill-bill.billing.plugin.java</groupId>
+            <artifactId>killbill-base-plugin</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kill-bill.commons</groupId>
+            <artifactId>killbill-clock</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kill-bill.commons</groupId>
+            <artifactId>killbill-embeddeddb-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -57,14 +141,6 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -100,13 +176,19 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.killbill.billing.plugin.paymenttest.PaymentTestActivator</Bundle-Activator>
-                        <Export-Package>
-                            org.killbill.billing.plugin.service
-                        </Export-Package>
-                        <Private-Package>org.killbill.billing.plugin.paymenttest.*</Private-Package>
+                        <Bundle-Activator>org.killbill.billing.plugin.payment.PaymentTestActivator</Bundle-Activator>
+                        <Export-Package/>
+                        <Private-Package>org.killbill.billing.plugin.payment.*</Private-Package>
                         <!-- Optional resolution because exported by the Felix system bundle -->
                         <Import-Package>
                             org.killbill.billing.account.api;
@@ -257,21 +339,13 @@
                         </Import-Package>
                     </instructions>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>assemble-killbill-osgi-bundles-paymenttest-java-plugin</id>
+                        <id>assemble-killbill-osgi-bundles-payment-java-plugin</id>
                         <goals>
                             <goal>shade</goal>
                         </goals>
@@ -291,55 +365,45 @@
             </plugin>
         </plugins>
     </build>
-    <!--  <build>-->
-    <!--    <pluginManagement>&lt;!&ndash; lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) &ndash;&gt;-->
-    <!--      <plugins>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-clean-plugin</artifactId>-->
-    <!--          <version>3.1.0</version>-->
-    <!--        </plugin>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-site-plugin</artifactId>-->
-    <!--          <version>3.7.1</version>-->
-    <!--        </plugin>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-project-info-reports-plugin</artifactId>-->
-    <!--          <version>3.0.0</version>-->
-    <!--        </plugin>-->
-    <!--        &lt;!&ndash; see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging &ndash;&gt;-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-resources-plugin</artifactId>-->
-    <!--          <version>3.0.2</version>-->
-    <!--        </plugin>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-compiler-plugin</artifactId>-->
-    <!--          <version>3.8.0</version>-->
-    <!--        </plugin>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-surefire-plugin</artifactId>-->
-    <!--          <version>2.22.1</version>-->
-    <!--        </plugin>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-jar-plugin</artifactId>-->
-    <!--          <version>3.0.2</version>-->
-    <!--        </plugin>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-install-plugin</artifactId>-->
-    <!--          <version>2.5.2</version>-->
-    <!--        </plugin>-->
-    <!--        <plugin>-->
-    <!--          <artifactId>maven-deploy-plugin</artifactId>-->
-    <!--          <version>2.8.2</version>-->
-    <!--        </plugin>-->
-    <!--      </plugins>-->
-    <!--    </pluginManagement>-->
-    <!--  </build>-->
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
+    <profiles>
+        <profile>
+            <id>jdk18</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <showDeprecation>true</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <fork>true</fork>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>jar</goal>
+                                    <goal>test-jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>jdk18</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skipIfEmpty>true</skipIfEmpty>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
