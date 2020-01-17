@@ -69,7 +69,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                     return PaymentPluginStatus.UNDEFINED;
             }
         }
-        return null;
+        return PaymentPluginStatus.PROCESSED;
     }
 
     @Override

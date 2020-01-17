@@ -67,6 +67,21 @@ public class PaymentTestPluginApiTest {
     }
 
     @Test
+    public void testReturnInfoPlugin() throws PaymentPluginApiException {
+        final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                Currency.EUR,
+                null,
+                this.pluginCallContext);
+
+        Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.PROCESSED);
+    }
+
+    @Test
     public void testReturnNull() throws PaymentPluginApiException {
         this.testingStates.add(TestingStates.Actions.RETURN_NIL, null);
         final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
@@ -78,6 +93,8 @@ public class PaymentTestPluginApiTest {
                 Currency.EUR,
                 null,
                 this.pluginCallContext);
+
+        Assert.assertNull(ret);
     }
 
     @Test(expectedExceptions = PaymentPluginApiException.class)
@@ -93,7 +110,6 @@ public class PaymentTestPluginApiTest {
                 Currency.EUR,
                 null,
                 this.pluginCallContext);
-        Assert.assertNull(ret);
     }
 
     @Test
