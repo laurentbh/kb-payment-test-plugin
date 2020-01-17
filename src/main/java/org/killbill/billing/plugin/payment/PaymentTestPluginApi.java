@@ -1,5 +1,7 @@
 package org.killbill.billing.plugin.payment;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import org.joda.time.DateTime;
 import org.killbill.billing.catalog.api.Currency;
 import org.killbill.billing.osgi.libs.killbill.OSGIConfigPropertiesService;
@@ -55,7 +57,6 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
 
         // find action from request properties
         if (pluginProperties != null) {
-            StreamSupport.stream(pluginProperties.spliterator(), false);
             final Optional<PluginProperty> actionFromProperties =
                     StreamSupport.stream(pluginProperties.spliterator(), false)
                                  // find a plugin property
@@ -86,6 +87,51 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
             action = this.testingStates.getStates().get(methodCalled);
         }
         return action;
+    }
+
+    @VisibleForTesting
+    int getSleepFromProperty(final String methodCalled,
+                             final Iterable<PluginProperty> pluginProperties) {
+        int sleep = 0;
+        if (pluginProperties != null) {
+            final Optional<PluginProperty> actionFromProperties =
+                    StreamSupport.stream(pluginProperties.spliterator(), false)
+                                 // find a plugin property
+                                 .filter(p -> {
+                                     try {
+                                         // where key is a known action
+                                         TestingStates.Actions a = TestingStates.Actions.valueOf(p.getKey());
+                                         // and value match all or the method called
+                                         if (a.compareTo(TestingStates.Actions.ACTION_SLEEP) == 0 && (
+                                                 p.getValue() == null || ((String) p.getValue()).length() == 0 ||
+                                                         ((String) p.getValue()).compareTo("*") == 0 ||
+                                                         ((String) p.getValue()).compareTo(methodCalled) == 0)) {
+                                             return true;
+                                         }
+                                     }
+                                     catch (final IllegalArgumentException ignore) {}
+                                     return false;
+                                 })
+                                 .findFirst();
+            if (actionFromProperties.isPresent()) {
+                // find sleep value
+                sleep = StreamSupport.stream(pluginProperties.spliterator(), false)
+                                     .filter(property -> TestingStates.SLEEP_PLUGIN_CONFIG_PARAM.compareTo(property.getKey()) == 0)
+                                     .findFirst().map(property -> Integer.valueOf((String) property.getValue()))
+                                     .orElse(0);
+            }
+        }
+        return sleep;
+        //        final Integer sleep = this.testingStates.getSleeps().get(methodCalled);
+        //        if (sleep != null && sleep.compareTo(this.noSleep) > 0) {
+        //            try {
+        //                this.LOGGER.info("sleeping in " + methodCalled + " for " + sleep.intValue() + "(s)");
+        //                Thread.sleep(sleep.intValue() * 1000000);
+        //            }
+        //            catch (final InterruptedException ignore) {
+        //            }
+        //        }
+        //        return sleep;
     }
 
     private PaymentPluginStatus handleState(final Iterable<PluginProperty> pluginProperties) throws PaymentPluginApiException {

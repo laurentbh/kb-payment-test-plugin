@@ -267,4 +267,21 @@ public class PaymentTestPluginApiTest {
                 this.pluginCallContext);
         Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.ERROR);
     }
+
+    @Test
+    public void sleepFromConfig() {
+        ImmutableList<PluginProperty> properties = ImmutableList.of(
+                new PluginProperty(TestingStates.Actions.ACTION_SLEEP.toString(), "authorizePayment", false),
+                new PluginProperty(TestingStates.SLEEP_PLUGIN_CONFIG_PARAM, "60", false));
+
+
+        Assert.assertEquals(this.paymentTestPugin.getSleepFromProperty("authorizePayment", properties), 60);
+
+        properties = ImmutableList.of(
+                new PluginProperty(TestingStates.Actions.ACTION_SLEEP.toString(), "authorizePayment", false),
+                new PluginProperty("missing sleep param", "60", false));
+
+
+        Assert.assertEquals(this.paymentTestPugin.getSleepFromProperty("authorizePayment", properties), 0);
+    }
 }

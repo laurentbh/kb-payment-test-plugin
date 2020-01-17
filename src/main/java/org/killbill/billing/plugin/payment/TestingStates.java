@@ -13,14 +13,16 @@ import javax.annotation.Nullable;
 
 public class TestingStates {
 
-    private final Set<String> allowedMethods;
+    public static final String      SLEEP_PLUGIN_CONFIG_PARAM = "sleepFor";
+    private final       Set<String> allowedMethods;
 
     public enum Actions {
         ACTION_RETURN_PLUGIN_STATUS_PENDING,
         ACTION_RETURN_PLUGIN_STATUS_ERROR,
         ACTION_RETURN_PLUGIN_STATUS_CANCELED,
         ACTION_THROW_EXCEPTION,
-        RETURN_NIL
+        RETURN_NIL,
+        ACTION_SLEEP
     }
 
     // key is method, "*" is for any method
