@@ -138,7 +138,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         final PaymentPluginStatus pluginStatus = handleState();
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
-                                                          UUID.randomUUID(),
+                                                          kbPaymentMethodId,
                                                           TransactionType.AUTHORIZE,
                                                           amount,
                                                           currency,
@@ -163,7 +163,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         final PaymentPluginStatus pluginStatus = handleState();
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
-                                                          UUID.randomUUID(),
+                                                          kbPaymentMethodId,
                                                           TransactionType.CAPTURE,
                                                           amount,
                                                           currency,
@@ -188,7 +188,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         final PaymentPluginStatus pluginStatus = handleState();
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
-                                                          UUID.randomUUID(),
+                                                          kbPaymentMethodId,
                                                           TransactionType.PURCHASE,
                                                           amount,
                                                           currency,
@@ -211,7 +211,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         final PaymentPluginStatus pluginStatus = handleState();
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
-                                                          UUID.randomUUID(),
+                                                          kbPaymentMethodId,
                                                           TransactionType.VOID,
                                                           null,
                                                           null,
@@ -236,7 +236,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         final PaymentPluginStatus pluginStatus = handleState();
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
-                                                          UUID.randomUUID(),
+                                                          kbPaymentMethodId,
                                                           TransactionType.CREDIT,
                                                           amount,
                                                           currency,
@@ -261,7 +261,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         final PaymentPluginStatus pluginStatus = handleState();
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
-                                                          UUID.randomUUID(),
+                                                          kbPaymentMethodId,
                                                           TransactionType.REFUND,
                                                           null,
                                                           null,
