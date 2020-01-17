@@ -27,8 +27,6 @@ public class PaymentTestActivator extends KillbillActivatorBase {
 
         super.start(context);
 
-        logger.warn(">>>> PaymentTestActivator::starting !!!!!!!");
-
         final PaymentTestDao paymentTestDao = new PaymentTestDao(this.dataSource.getDataSource());
         final TestingStates testingStates = new TestingStates();
 
@@ -47,6 +45,7 @@ public class PaymentTestActivator extends KillbillActivatorBase {
                                                          this.dataSource,
                                                          this.clock,
                                                          this.configProperties).withRouteClass(PaymentTestResource.class)
+                                                                               .withService(testingStates)
                                                                                .withService(this.killbillAPI)
                                                                                .withService(this.roOSGIkillbillAPI)
                                                                                .withService(this.clock)
