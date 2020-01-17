@@ -28,7 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.StreamSupport;
 
 public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResponsesRecord, TestpaymentResponses, TestpaymentPaymentMethodsRecord, TestpaymentPaymentMethods> {
 
@@ -48,19 +50,52 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         this.testingStates = testingStates;
     }
 
-    private PaymentPluginStatus handleState() throws PaymentPluginApiException {
+    private TestingStates.Actions getAction(final String methodCalled,
+                                            final Iterable<PluginProperty> pluginProperties) {
+
+        // find action from request properties
+        if (pluginProperties != null) {
+            StreamSupport.stream(pluginProperties.spliterator(), false);
+            final Optional<PluginProperty> actionFromProperties =
+                    StreamSupport.stream(pluginProperties.spliterator(), false)
+                                 // find a plugin property
+                                 .filter(p -> {
+                                     try {
+                                         // where key is a known action
+                                         TestingStates.Actions.valueOf(p.getKey());
+                                         // and value match all or the method called
+                                         if (p.getValue() == null || ((String) p.getValue()).length() == 0 ||
+                                                 ((String) p.getValue()).compareTo("*") == 0 ||
+                                                 ((String) p.getValue()).compareTo(methodCalled) == 0) {
+                                             return true;
+                                         }
+                                     }
+                                     catch (final IllegalArgumentException ignore) {}
+                                     return false;
+                                 })
+                                 .findFirst();
+            if (actionFromProperties.isPresent()) {
+                return TestingStates.Actions.valueOf(actionFromProperties.get().getKey());
+            }
+        }
+        // find action from global configuration
         TestingStates.Actions action = this.testingStates.getStates().get("*");
 
-        String calledMethod = "All";
+        final String calledMethod = "All";
         if (action == null) {
-            calledMethod = Thread.currentThread().getStackTrace()[2].getMethodName();
-            action = this.testingStates.getStates().get(calledMethod);
+            action = this.testingStates.getStates().get(methodCalled);
         }
+        return action;
+    }
 
-        final Integer sleep = this.testingStates.getSleeps().get(calledMethod);
+    private PaymentPluginStatus handleState(final Iterable<PluginProperty> pluginProperties) throws PaymentPluginApiException {
+        final String methodCalled = Thread.currentThread().getStackTrace()[2].getMethodName();
+        final TestingStates.Actions action = getAction(methodCalled, pluginProperties);
+
+        final Integer sleep = this.testingStates.getSleeps().get(methodCalled);
         if (sleep != null && sleep.compareTo(this.noSleep) > 0) {
             try {
-                this.LOGGER.info("sleeping in " + calledMethod + " for " + sleep.intValue() + "(s)");
+                this.LOGGER.info("sleeping in " + methodCalled + " for " + sleep.intValue() + "(s)");
                 Thread.sleep(sleep.intValue() * 1000000);
             }
             catch (final InterruptedException ignore) {
@@ -77,7 +112,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                 case ACTION_RETURN_PLUGIN_STATUS_ERROR:
                     return PaymentPluginStatus.ERROR;
                 case ACTION_THROW_EXCEPTION:
-                    throw new PaymentPluginApiException("test", action.name() + " for " + calledMethod);
+                    throw new PaymentPluginApiException("test", action.name() + " for " + methodCalled);
                 default:
                     return PaymentPluginStatus.UNDEFINED;
             }
@@ -148,7 +183,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                          final Currency currency,
                                                          final Iterable<PluginProperty> properties,
                                                          final CallContext context) throws PaymentPluginApiException {
-        final PaymentPluginStatus pluginStatus = handleState();
+        final PaymentPluginStatus pluginStatus = handleState(properties);
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
                                                           kbPaymentMethodId,
@@ -173,7 +208,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                        final Currency currency,
                                                        final Iterable<PluginProperty> properties,
                                                        final CallContext context) throws PaymentPluginApiException {
-        final PaymentPluginStatus pluginStatus = handleState();
+        final PaymentPluginStatus pluginStatus = handleState(properties);
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
                                                           kbPaymentMethodId,
@@ -198,7 +233,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                         final Currency currency,
                                                         final Iterable<PluginProperty> properties,
                                                         final CallContext context) throws PaymentPluginApiException {
-        final PaymentPluginStatus pluginStatus = handleState();
+        final PaymentPluginStatus pluginStatus = handleState(properties);
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
                                                           kbPaymentMethodId,
@@ -221,7 +256,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                     final UUID kbPaymentMethodId,
                                                     final Iterable<PluginProperty> properties,
                                                     final CallContext context) throws PaymentPluginApiException {
-        final PaymentPluginStatus pluginStatus = handleState();
+        final PaymentPluginStatus pluginStatus = handleState(properties);
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
                                                           kbPaymentMethodId,
@@ -246,7 +281,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                       final Currency currency,
                                                       final Iterable<PluginProperty> properties,
                                                       final CallContext context) throws PaymentPluginApiException {
-        final PaymentPluginStatus pluginStatus = handleState();
+        final PaymentPluginStatus pluginStatus = handleState(properties);
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
                                                           kbPaymentMethodId,
@@ -271,7 +306,7 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                       final Currency currency,
                                                       final Iterable<PluginProperty> properties,
                                                       final CallContext context) throws PaymentPluginApiException {
-        final PaymentPluginStatus pluginStatus = handleState();
+        final PaymentPluginStatus pluginStatus = handleState(properties);
         if (pluginStatus != null) {
             return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
                                                           kbPaymentMethodId,

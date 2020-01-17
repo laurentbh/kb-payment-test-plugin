@@ -1,10 +1,13 @@
 package org.killbill.billing.plugin.payment;
 
+import com.google.common.collect.ImmutableList;
+
 import org.joda.time.DateTime;
 import org.killbill.billing.catalog.api.Currency;
 import org.killbill.billing.osgi.libs.killbill.OSGIConfigPropertiesService;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillAPI;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillLogService;
+import org.killbill.billing.payment.api.PluginProperty;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApiException;
 import org.killbill.billing.payment.plugin.api.PaymentPluginStatus;
 import org.killbill.billing.payment.plugin.api.PaymentTransactionInfoPlugin;
@@ -67,7 +70,8 @@ public class PaymentTestPluginApiTest {
     }
 
     @Test
-    public void testReturnInfoPlugin() throws PaymentPluginApiException {
+    public void regularProcess() throws PaymentPluginApiException {
+        // no global config
         final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
@@ -82,8 +86,9 @@ public class PaymentTestPluginApiTest {
     }
 
     @Test
-    public void testReturnNull() throws PaymentPluginApiException {
+    public void returnNull() throws PaymentPluginApiException {
         this.testingStates.add(TestingStates.Actions.RETURN_NIL, null);
+
         final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
@@ -98,7 +103,7 @@ public class PaymentTestPluginApiTest {
     }
 
     @Test(expectedExceptions = PaymentPluginApiException.class)
-    public void testThrowException() throws PaymentPluginApiException {
+    public void throwException() throws PaymentPluginApiException {
         this.testingStates.add(TestingStates.Actions.ACTION_THROW_EXCEPTION, null);
 
         final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
@@ -113,7 +118,7 @@ public class PaymentTestPluginApiTest {
     }
 
     @Test
-    public void testInfoPluginStatus() throws PaymentPluginApiException {
+    public void setInfoPluginStatus() throws PaymentPluginApiException {
         this.testingStates.add(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_PENDING, "authorizePayment");
         this.testingStates.add(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_CANCELED, "capturePayment");
         this.testingStates.add(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_ERROR, "purchasePayment");
@@ -148,6 +153,117 @@ public class PaymentTestPluginApiTest {
                 BigDecimal.TEN,
                 Currency.EUR,
                 null,
+                this.pluginCallContext);
+        Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.ERROR);
+    }
+
+    @Test
+    public void useValidPluginProperty() throws PaymentPluginApiException {
+        final ImmutableList<PluginProperty> properties = ImmutableList.of(
+                new PluginProperty(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_PENDING.toString(),
+                                   "authorizePayment",
+                                   false));
+
+        final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                Currency.EUR,
+                properties,
+                this.pluginCallContext);
+        Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.PENDING);
+    }
+
+    @Test
+    public void wildcardPluginProperty() throws PaymentPluginApiException {
+        ImmutableList<PluginProperty> properties = ImmutableList.of(
+                new PluginProperty(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_PENDING.toString(),
+                                   null,
+                                   false));
+
+        PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                Currency.EUR,
+                properties,
+                this.pluginCallContext);
+        Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.PENDING);
+
+        properties = ImmutableList.of(
+                new PluginProperty(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_PENDING.toString(),
+                                   "",
+                                   false));
+
+        ret = this.paymentTestPugin.authorizePayment(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                Currency.EUR,
+                properties,
+                this.pluginCallContext);
+        Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.PENDING);
+
+        properties = ImmutableList.of(
+                new PluginProperty(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_PENDING.toString(),
+                                   "*",
+                                   false));
+
+        ret = this.paymentTestPugin.authorizePayment(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                Currency.EUR,
+                properties,
+                this.pluginCallContext);
+        Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.PENDING);
+    }
+
+    @Test
+    public void useInvalidPluginProperty() throws PaymentPluginApiException {
+        final ImmutableList<PluginProperty> properties = ImmutableList.of(
+                new PluginProperty("dummmy",
+                                   "authorizePayment",
+                                   false));
+
+        final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                Currency.EUR,
+                properties,
+                this.pluginCallContext);
+        Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.PROCESSED);
+    }
+
+    @Test
+    public void pluginPropertyOverridesGlobal() throws PaymentPluginApiException {
+        this.testingStates.add(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_PENDING, "authorizePayment");
+        this.testingStates.add(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_CANCELED, "capturePayment");
+
+        final ImmutableList<PluginProperty> properties = ImmutableList.of(
+                new PluginProperty(TestingStates.Actions.ACTION_RETURN_PLUGIN_STATUS_ERROR.toString(),
+                                   "authorizePayment",
+                                   false));
+
+        final PaymentTransactionInfoPlugin ret = this.paymentTestPugin.authorizePayment(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                Currency.EUR,
+                properties,
                 this.pluginCallContext);
         Assert.assertEquals(ret.getStatus(), PaymentPluginStatus.ERROR);
     }
