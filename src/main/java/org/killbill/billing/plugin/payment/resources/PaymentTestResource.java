@@ -1,5 +1,7 @@
 package org.killbill.billing.plugin.payment.resources;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.jooby.Result;
 import org.jooby.Results;
 import org.jooby.Status;
@@ -18,6 +20,7 @@ import javax.inject.Singleton;
 public class PaymentTestResource {
 
     private final TestingStates testingStates;
+    private final ObjectMapper  objectMapper = new ObjectMapper();
 
     @Inject
     public PaymentTestResource(final TestingStates testingStates) {
@@ -26,8 +29,8 @@ public class PaymentTestResource {
 
     @Path("status")
     @GET
-    public void status() {
-
+    public Result status() {
+        return Results.with(this.testingStates, Status.OK);
     }
 
     @Path("configure")

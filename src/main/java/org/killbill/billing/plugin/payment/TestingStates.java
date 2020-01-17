@@ -1,5 +1,7 @@
 package org.killbill.billing.plugin.payment;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ public class TestingStates {
     }
 
     // key is method, "*" is for any method
+    @JsonSerialize
     private final Map<String, Actions> states;
 
     public TestingStates() {
