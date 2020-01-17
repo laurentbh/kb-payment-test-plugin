@@ -27,8 +27,13 @@ public class TestingStates {
     @JsonSerialize
     private final Map<String, Actions> states;
 
+    // key is method, "*" is for any method
+    @JsonSerialize
+    private final Map<String, Integer> sleeps;
+
     public TestingStates() {
         this.states = new HashMap<>();
+        this.sleeps = new HashMap<>();
 
         final Class cls = PaymentTestPluginApi.class;
         final Method[] methods = cls.getMethods();
@@ -48,7 +53,23 @@ public class TestingStates {
         return true;
     }
 
+    public boolean add(final Actions action, @Nullable final String forMethod, final int sleep) {
+
+        if (forMethod != null) {
+            if (this.allowedMethods.contains(forMethod) == false) {
+                return false;
+            }
+        }
+        final String method = (forMethod != null) ? forMethod : "*";
+        this.sleeps.put(method, sleep);
+        return true;
+    }
+
     public Map<String, Actions> getStates() {
         return this.states;
+    }
+
+    public Map<String, Integer> getSleeps() {
+        return this.sleeps;
     }
 }

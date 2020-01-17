@@ -1,7 +1,5 @@
 package org.killbill.billing.plugin.payment.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.jooby.Result;
 import org.jooby.Results;
 import org.jooby.Status;
@@ -20,7 +18,6 @@ import javax.inject.Singleton;
 public class PaymentTestResource {
 
     private final TestingStates testingStates;
-    private final ObjectMapper  objectMapper = new ObjectMapper();
 
     @Inject
     public PaymentTestResource(final TestingStates testingStates) {
@@ -37,8 +34,17 @@ public class PaymentTestResource {
     @POST
     public Result configure(@Body final Payload payload) {
 
-        final boolean added = this.testingStates.add(TestingStates.Actions.valueOf(payload.getAction()),
-                                                     payload.getMethods());
+        final boolean added;
+
+        if (payload.getSeepTime() != 0) {
+            added = this.testingStates.add(TestingStates.Actions.valueOf(payload.getAction()),
+                                           payload.getMethods(),
+                                           payload.getSeepTime());
+        }
+        else {
+            added = this.testingStates.add(TestingStates.Actions.valueOf(payload.getAction()),
+                                           payload.getMethods());
+        }
 
         if (!added) {
             // TODO: add reason in error body

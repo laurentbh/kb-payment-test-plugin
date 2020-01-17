@@ -23,6 +23,8 @@ import org.killbill.billing.plugin.payment.dao.gen.tables.records.TestpaymentPay
 import org.killbill.billing.plugin.payment.dao.gen.tables.records.TestpaymentResponsesRecord;
 import org.killbill.billing.util.callcontext.CallContext;
 import org.killbill.clock.Clock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -30,8 +32,10 @@ import java.util.UUID;
 
 public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResponsesRecord, TestpaymentResponses, TestpaymentPaymentMethodsRecord, TestpaymentPaymentMethods> {
 
+    private final Logger         LOGGER  = LoggerFactory.getLogger(PaymentTestPluginApi.class);
     private final PaymentTestDao dao;
     private final TestingStates  testingStates;
+    private final Integer        noSleep = new Integer(0);
 
     public PaymentTestPluginApi(final OSGIKillbillAPI killbillAPI,
                                 final OSGIConfigPropertiesService configProperties,
@@ -53,6 +57,15 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
             action = this.testingStates.getStates().get(calledMethod);
         }
 
+        final Integer sleep = this.testingStates.getSleeps().get(calledMethod);
+        if (sleep != null && sleep.compareTo(this.noSleep) > 0) {
+            try {
+                this.LOGGER.info("sleeping in " + calledMethod + " for " + sleep.intValue() + "(s)");
+                Thread.sleep(sleep.intValue() * 1000000);
+            }
+            catch (final InterruptedException ignore) {
+            }
+        }
         if (action != null) {
             switch (action) {
                 case RETURN_NIL:
