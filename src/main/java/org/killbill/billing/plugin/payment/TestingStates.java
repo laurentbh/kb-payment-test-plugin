@@ -17,7 +17,7 @@ public class TestingStates {
         ACTION_RETURN_PLUGIN_STATUS_PENDING,
         ACTION_RETURN_PLUGIN_STATUS_ERROR,
         ACTION_RETURN_PLUGIN_STATUS_CANCELED,
-        THROW_EXCEPTION,
+        ACTION_THROW_EXCEPTION,
         RETURN_NIL
     }
 
@@ -43,5 +43,9 @@ public class TestingStates {
         final String method = (forMethod != null) ? forMethod : "*";
         this.states.put(method, action);
         return true;
+    }
+
+    public Map<String, Actions> getStates() {
+        return this.states;
     }
 }

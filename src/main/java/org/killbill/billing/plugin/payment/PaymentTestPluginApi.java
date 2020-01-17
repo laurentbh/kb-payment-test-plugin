@@ -7,12 +7,15 @@ import org.killbill.billing.osgi.libs.killbill.OSGIKillbillAPI;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillLogService;
 import org.killbill.billing.payment.api.PaymentMethodPlugin;
 import org.killbill.billing.payment.api.PluginProperty;
+import org.killbill.billing.payment.api.TransactionType;
 import org.killbill.billing.payment.plugin.api.GatewayNotification;
 import org.killbill.billing.payment.plugin.api.HostedPaymentPageFormDescriptor;
 import org.killbill.billing.payment.plugin.api.PaymentMethodInfoPlugin;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApiException;
+import org.killbill.billing.payment.plugin.api.PaymentPluginStatus;
 import org.killbill.billing.payment.plugin.api.PaymentTransactionInfoPlugin;
 import org.killbill.billing.plugin.api.payment.PluginPaymentPluginApi;
+import org.killbill.billing.plugin.api.payment.PluginPaymentTransactionInfoPlugin;
 import org.killbill.billing.plugin.payment.dao.PaymentTestDao;
 import org.killbill.billing.plugin.payment.dao.gen.tables.TestpaymentPaymentMethods;
 import org.killbill.billing.plugin.payment.dao.gen.tables.TestpaymentResponses;
@@ -39,6 +42,34 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
         super(killbillAPI, configProperties, logService, clock, dao);
         this.dao = dao;
         this.testingStates = testingStates;
+    }
+
+    private PaymentPluginStatus handleState() throws PaymentPluginApiException {
+        TestingStates.Actions action = this.testingStates.getStates().get("*");
+
+        String calledMethod = "All";
+        if (action == null) {
+            calledMethod = Thread.currentThread().getStackTrace()[2].getMethodName();
+            action = this.testingStates.getStates().get(calledMethod);
+        }
+
+        if (action != null) {
+            switch (action) {
+                case RETURN_NIL:
+                    return null;
+                case ACTION_RETURN_PLUGIN_STATUS_CANCELED:
+                    return PaymentPluginStatus.CANCELED;
+                case ACTION_RETURN_PLUGIN_STATUS_PENDING:
+                    return PaymentPluginStatus.PENDING;
+                case ACTION_RETURN_PLUGIN_STATUS_ERROR:
+                    return PaymentPluginStatus.ERROR;
+                case ACTION_THROW_EXCEPTION:
+                    throw new PaymentPluginApiException("test", action.name() + " for " + calledMethod);
+                default:
+                    return PaymentPluginStatus.UNDEFINED;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -104,6 +135,19 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                          final Currency currency,
                                                          final Iterable<PluginProperty> properties,
                                                          final CallContext context) throws PaymentPluginApiException {
+        final PaymentPluginStatus pluginStatus = handleState();
+        if (pluginStatus != null) {
+            return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
+                                                          UUID.randomUUID(),
+                                                          TransactionType.AUTHORIZE,
+                                                          amount,
+                                                          currency,
+                                                          pluginStatus,
+                                                          null, null, null, null,
+                                                          DateTime.now(),
+                                                          DateTime.now(),
+                                                          null);
+        }
         return null;
     }
 
@@ -116,6 +160,19 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                        final Currency currency,
                                                        final Iterable<PluginProperty> properties,
                                                        final CallContext context) throws PaymentPluginApiException {
+        final PaymentPluginStatus pluginStatus = handleState();
+        if (pluginStatus != null) {
+            return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
+                                                          UUID.randomUUID(),
+                                                          TransactionType.CAPTURE,
+                                                          amount,
+                                                          currency,
+                                                          pluginStatus,
+                                                          null, null, null, null,
+                                                          DateTime.now(),
+                                                          DateTime.now(),
+                                                          null);
+        }
         return null;
     }
 
@@ -128,6 +185,19 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                         final Currency currency,
                                                         final Iterable<PluginProperty> properties,
                                                         final CallContext context) throws PaymentPluginApiException {
+        final PaymentPluginStatus pluginStatus = handleState();
+        if (pluginStatus != null) {
+            return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
+                                                          UUID.randomUUID(),
+                                                          TransactionType.PURCHASE,
+                                                          amount,
+                                                          currency,
+                                                          pluginStatus,
+                                                          null, null, null, null,
+                                                          DateTime.now(),
+                                                          DateTime.now(),
+                                                          null);
+        }
         return null;
     }
 
@@ -138,6 +208,19 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                     final UUID kbPaymentMethodId,
                                                     final Iterable<PluginProperty> properties,
                                                     final CallContext context) throws PaymentPluginApiException {
+        final PaymentPluginStatus pluginStatus = handleState();
+        if (pluginStatus != null) {
+            return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
+                                                          UUID.randomUUID(),
+                                                          TransactionType.VOID,
+                                                          null,
+                                                          null,
+                                                          pluginStatus,
+                                                          null, null, null, null,
+                                                          DateTime.now(),
+                                                          DateTime.now(),
+                                                          null);
+        }
         return null;
     }
 
@@ -150,6 +233,19 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                       final Currency currency,
                                                       final Iterable<PluginProperty> properties,
                                                       final CallContext context) throws PaymentPluginApiException {
+        final PaymentPluginStatus pluginStatus = handleState();
+        if (pluginStatus != null) {
+            return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
+                                                          UUID.randomUUID(),
+                                                          TransactionType.CREDIT,
+                                                          amount,
+                                                          currency,
+                                                          pluginStatus,
+                                                          null, null, null, null,
+                                                          DateTime.now(),
+                                                          DateTime.now(),
+                                                          null);
+        }
         return null;
     }
 
@@ -162,6 +258,19 @@ public class PaymentTestPluginApi extends PluginPaymentPluginApi<TestpaymentResp
                                                       final Currency currency,
                                                       final Iterable<PluginProperty> properties,
                                                       final CallContext context) throws PaymentPluginApiException {
+        final PaymentPluginStatus pluginStatus = handleState();
+        if (pluginStatus != null) {
+            return new PluginPaymentTransactionInfoPlugin(kbPaymentId,
+                                                          UUID.randomUUID(),
+                                                          TransactionType.REFUND,
+                                                          null,
+                                                          null,
+                                                          pluginStatus,
+                                                          null, null, null, null,
+                                                          DateTime.now(),
+                                                          DateTime.now(),
+                                                          null);
+        }
         return null;
     }
 
